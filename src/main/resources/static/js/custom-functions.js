@@ -96,10 +96,6 @@ window.onload = ()=>{
 		event.preventDefault();
 		readNextMessage(readEndPoint);
 	});
-	document.addEventListener('DOMContentLoaded', (event) => {
-		//
-	});
-	
 };
 		
 })();
