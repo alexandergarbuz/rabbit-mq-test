@@ -36,7 +36,7 @@ public class MessageController {
 	}
 	
 	@GetMapping("/read")
-	public ResponseEntity<Message> read() throws IOException, TimeoutException {
+	public ResponseEntity<Message> read() throws IOException, TimeoutException, InterruptedException {
 		Message nextMessage = messageService.readNext();
 		LOG.info("Reading {} ", nextMessage);
 		

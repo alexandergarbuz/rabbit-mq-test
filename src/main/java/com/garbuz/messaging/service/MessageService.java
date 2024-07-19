@@ -1,6 +1,8 @@
 package com.garbuz.messaging.service;
 
 import java.io.IOException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
@@ -20,6 +22,14 @@ public class MessageService {
 	
 	public static final String QUEUE_NAME = "MessageServiceTest";
 	
+	private final BlockingQueue<String> messageQueue = new LinkedBlockingQueue<>();
+	
+	
+//	@Autowired
+//	private RabbitMQReceiver receiver;
+//	@Autowired
+//	private RabbitMQSender sender;
+	
 	public Message send(final Message messageToSend) throws IOException, TimeoutException {
 		LOG.info("Sending {}", messageToSend);
 		
@@ -34,23 +44,27 @@ public class MessageService {
 		return messageToSend;
 	}
 	
-	public Message readNext() throws IOException, TimeoutException {
+	public Message readNext() throws IOException, TimeoutException, InterruptedException {
 		LOG.info("Reading next message");
 		Message nextMessage = new Message();
 	    ConnectionFactory factory = new ConnectionFactory();
 	    factory.setHost("localhost");
-	    Connection connection = factory.newConnection();
-	    Channel channel = connection.createChannel();
-
-	    channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+	    try(Connection connection = factory.newConnection();
+	    	    Channel channel = connection.createChannel();){
+		    channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+		    
+		    DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+			        String message = new String(delivery.getBody(), "UTF-8");
+			        messageQueue.offer(message);
+			        LOG.info(" [x] Received '" + message + "'");
+			};
+		    channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> { });	    	
+	    }
 	    
-	    DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-	        String message = new String(delivery.getBody(), "UTF-8");
-	        nextMessage.setText("Message #" + System.currentTimeMillis() + ":" + message);
-	        LOG.info(" [x] Received '" + message + "'");
-	    };
-	    channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> { });
+	    String message = messageQueue.take();
+	    nextMessage.setText("Message #" + System.currentTimeMillis() + ":" + message);
 		nextMessage.setSent(false);
+		
 		return nextMessage;
 	}
 }
