@@ -7,7 +7,7 @@
 	},
 	"item": [
 		{
-			"name": "New Request",
+			"name": "Send Message",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -30,6 +30,14 @@
 						"send"
 					]
 				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read Next",
+			"request": {
+				"method": "GET",
+				"header": []
 			},
 			"response": []
 		}
