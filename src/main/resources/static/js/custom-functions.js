@@ -7,16 +7,18 @@ function showSpinner() {
 	document.getElementById("delaySpinner").style.display="block";
 }
 
-function sendMessage(message, enpointUrl) {
+function sendMessage(toAddress, subject, message, enpointUrl) {
 	var data = {
-		text: message
+		toAddress: toAddress,
+		subject: subject,
+		body: message
 	};
 	showSpinner();
 	setTimeout(() => {
 		fetch(enpointUrl, {
 			method:"POST",
 			headers: {"Content-Type": "application/json"},
-			body: JSON.stringify(data, null, 2)
+			body: JSON.stringify(data)
 			
 		})
 		.then(response => {
@@ -85,8 +87,10 @@ window.onload = ()=>{
 	//
 	document.getElementById("messageForm").addEventListener("submit", function(event) {
 		event.preventDefault();
+		var toAddress = document.getElementById("toAddressField").value;
+		var subject = document.getElementById("subjectField").value;
 		var message = document.getElementById("messageField").value;
-		sendMessage(message, sendEndPoint);
+		sendMessage(toAddress, subject, message, sendEndPoint);
 	});
 	document.getElementById("clearButton").addEventListener("click", function(event){
 		event.preventDefault();
