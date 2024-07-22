@@ -1,31 +1,44 @@
 package com.garbuz.messaging.model;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Message {
 
-	private String text;
-	private boolean sent;
+public class Message implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-	public String getText() {
-		return text;
+	private String toAddress;
+    private String subject;
+    private String body;
+	
+
+	public String getToAddress() {
+		return toAddress;
 	}
 
-	public void setText(String text) {
-		this.text = text;
+	public void setToAddress(String toAddress) {
+		this.toAddress = toAddress;
 	}
 
-	public boolean isSent() {
-		return sent;
+	public String getSubject() {
+		return subject;
 	}
 
-	public void setSent(boolean sent) {
-		this.sent = sent;
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+
+	public String getBody() {
+		return body;
+	}
+
+	public void setBody(String text) {
+		this.body = text;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(sent, text);
+		return Objects.hash(body, subject, toAddress);
 	}
 
 	@Override
@@ -37,13 +50,12 @@ public class Message {
 		if (getClass() != obj.getClass())
 			return false;
 		Message other = (Message) obj;
-		return sent == other.sent && Objects.equals(text, other.text);
+		return Objects.equals(body, other.body) && Objects.equals(subject, other.subject)
+				&& Objects.equals(toAddress, other.toAddress);
 	}
 
 	@Override
 	public String toString() {
-		return "Message [text=" + text + ", sent=" + sent + "]";
+		return "Message [toAddress=" + toAddress + ", subject=" + subject + ", body=" + body + "]";
 	}
-
-
 }

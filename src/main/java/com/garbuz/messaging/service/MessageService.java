@@ -1,70 +1,25 @@
 package com.garbuz.messaging.service;
 
-import java.io.IOException;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeoutException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.garbuz.messaging.config.RabbitMQConfig;
 import com.garbuz.messaging.model.Message;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.DeliverCallback;
 
 @Service
 public class MessageService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MessageService.class);
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 	
-	public static final String QUEUE_NAME = "MessageServiceTest";
-	
-	private final BlockingQueue<String> messageQueue = new LinkedBlockingQueue<>();
-	
-	
-//	@Autowired
-//	private RabbitMQReceiver receiver;
-//	@Autowired
-//	private RabbitMQSender sender;
-	
-	public Message send(final Message messageToSend) throws IOException, TimeoutException {
-		LOG.info("Sending {}", messageToSend);
-		
-		ConnectionFactory factory = new ConnectionFactory();
-		factory.setHost("localhost");
-		try (Connection connection = factory.newConnection();
-			Channel channel = connection.createChannel()) {
-			channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-			channel.basicPublish("", QUEUE_NAME, null, messageToSend.getText().getBytes());
-		}
-		messageToSend.setSent(true);
+    public Message send(final Message messageToSend) {
+    	LOG.debug("Putting message in {} queue {}", RabbitMQConfig.EMAIL_QUEUE, messageToSend);
+    	rabbitTemplate.convertAndSend(RabbitMQConfig.EMAIL_QUEUE, messageToSend);
 		return messageToSend;
-	}
-	
-	public Message readNext() throws IOException, TimeoutException, InterruptedException {
-		LOG.info("Reading next message");
-		Message nextMessage = new Message();
-	    ConnectionFactory factory = new ConnectionFactory();
-	    factory.setHost("localhost");
-	    try(Connection connection = factory.newConnection();
-	    	    Channel channel = connection.createChannel();){
-		    channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-		    
-		    DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-			        String message = new String(delivery.getBody(), "UTF-8");
-			        messageQueue.offer(message);
-			        LOG.info(" [x] Received '" + message + "'");
-			};
-		    channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> { });	    	
-	    }
-	    
-	    String message = messageQueue.take();
-	    nextMessage.setText("Message #" + System.currentTimeMillis() + ":" + message);
-		nextMessage.setSent(false);
-		
-		return nextMessage;
-	}
+    }
 }
