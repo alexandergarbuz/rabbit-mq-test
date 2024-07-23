@@ -1,5 +1,15 @@
 #version: '3.8'
 services:
+  web-app:
+    build:
+        context: .
+        dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    env_file: ".env.docker"
+      
+    networks:
+      - shared-network
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
@@ -12,7 +22,11 @@ services:
     volumes:
       - ./RabbitMQ/config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf  
        - rabbitmq_data:/var/lib/rabbitmq
-       
+    networks:
+      - shared-network       
 volumes:
   rabbitmq_data:
     driver: local    
+networks:
+  shared-network:
+    driver: bridge 
