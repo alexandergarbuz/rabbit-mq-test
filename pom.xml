@@ -8,10 +8,10 @@
 		<version>3.3.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.garbuz</groupId>
-	<artifactId>messaging</artifactId>
+	<groupId>com.garbuz.messaging</groupId>
+	<artifactId>rabbit-mq-test</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>rabbit-mq-test</name>
+	<name>Rabbit MQ Test Project</name>
 	<description>Test project for Rabbit MQ</description>
 	<url/>
 	<licenses>
