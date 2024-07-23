@@ -13,7 +13,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n\r\n    \"text\": \"test message\"\r\n\r\n}",
+					"raw": "{\r\n    \"toAddress\" : \"alexander.garbuz@gmail.com\",\r\n    \"subject\" : \"Hello\",\r\n    \"body\": \"test message\"\r\n\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
